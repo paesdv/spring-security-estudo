@@ -20,7 +20,7 @@ public class TokenProvider {
     @Value("${jwt.expiration}")
     private long expirationTime;
 
-    private String gerarToken(Authentication authentication){
+    public String gerarToken(Authentication authentication){
         UserDetails user = (UserDetails) authentication.getPrincipal();
         return buildToken(user.getUsername());
     }
