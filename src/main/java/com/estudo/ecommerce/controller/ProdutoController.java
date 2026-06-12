@@ -6,7 +6,6 @@ import com.estudo.ecommerce.model.dto.produto.ProdutoResponseDTO;
 import com.estudo.ecommerce.service.ProdutoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
