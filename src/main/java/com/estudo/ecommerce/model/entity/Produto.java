@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
@@ -19,7 +20,7 @@ public class Produto {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String nome;
 
     @Column(nullable = false)
@@ -29,5 +30,13 @@ public class Produto {
     private BigDecimal preco;
 
     private Integer estoque;
+
+    @Column(nullable = false)
+    private LocalDate dataCadastro;
+
+    @PrePersist
+    public void prePersist() {
+        this.dataCadastro = LocalDate.now();
+    }
 
 }

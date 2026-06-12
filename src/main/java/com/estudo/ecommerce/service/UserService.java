@@ -2,16 +2,12 @@ package com.estudo.ecommerce.service;
 
 import com.estudo.ecommerce.model.dto.user.AlterarEmailRequest;
 import com.estudo.ecommerce.model.dto.user.AlterarSenhaRequest;
-import com.estudo.ecommerce.model.dto.user.UserRequest;
-import com.estudo.ecommerce.model.dto.user.UserResponse;
 import com.estudo.ecommerce.model.entity.User;
-import com.estudo.ecommerce.model.enums.Roles;
 import com.estudo.ecommerce.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

@@ -3,6 +3,7 @@ package com.estudo.ecommerce.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -35,6 +36,8 @@ public class SecurityConfig {
                             response.setStatus(HttpStatus.FORBIDDEN.value());
                         }))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.GET, "/v1/produto/**").permitAll()
+                        .requestMatchers("/v1/produto/**").authenticated()
                         .requestMatchers("/v1/usuario/troca-email").authenticated()
                         .requestMatchers("/v1/auth/**").permitAll()
                         .anyRequest().authenticated()
