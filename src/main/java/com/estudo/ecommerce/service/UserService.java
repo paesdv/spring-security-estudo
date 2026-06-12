@@ -22,18 +22,7 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public UserResponse registerUser(UserRequest dto) {
-       return UserResponse.toResponse(
-               userRepository.save(
-                       User.builder()
-                               .nome(dto.nome())
-                               .senha(dto.senha())
-                               .email(dto.email())
-                               .role(Roles.CUSTOMER)
-                               .build()
-               )
-       );
-    }
+
 
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return userRepository.findByEmail(email)
