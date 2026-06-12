@@ -1,5 +1,6 @@
 package com.estudo.ecommerce.model.entity;
 
+import com.estudo.ecommerce.model.dto.produto.AlterarProdutoRequestDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -37,6 +38,15 @@ public class Produto {
     @PrePersist
     public void prePersist() {
         this.dataCadastro = LocalDate.now();
+    }
+
+
+
+    public void atualizarDados(AlterarProdutoRequestDTO request) {
+        request.nome().ifPresent(this::setNome);
+        request.descricao().ifPresent(this::setDescricao);
+        request.preco().ifPresent(this::setPreco);
+        request.estoque().ifPresent(this::setEstoque);
     }
 
 }
