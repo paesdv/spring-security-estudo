@@ -1,4 +1,4 @@
 package com.estudo.ecommerce.model.dto.user;
 
-public record LoginRequestDTO(String email, String password) {
+public record LoginRequestDTO(String email, String senha) {
 }

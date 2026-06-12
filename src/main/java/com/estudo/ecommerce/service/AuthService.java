@@ -48,7 +48,7 @@ public class AuthService {
 
     public TokenResponseDTO login(LoginRequestDTO dto) throws RuntimeException {
         try{
-            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(dto.email(), dto.password()));
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(dto.email(), dto.senha()));
             String token = tokenProvider.gerarToken(authentication);
 
             return new TokenResponseDTO(token, expirationTime);
