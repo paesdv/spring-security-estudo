@@ -1,6 +1,7 @@
 package com.estudo.ecommerce.controller;
 
 import com.estudo.ecommerce.model.dto.user.AlterarEmailRequest;
+import com.estudo.ecommerce.model.dto.user.AlterarSenhaRequest;
 import com.estudo.ecommerce.model.dto.user.RegisterRequestDTO;
 import com.estudo.ecommerce.model.entity.User;
 import com.estudo.ecommerce.repository.UserRepository;
@@ -30,6 +31,14 @@ public class UserController {
         String emailAtual = auth.getName();
         userService.changeEmail(emailAtual, request);
         return ResponseEntity.ok("Email atualizado com sucesso!");
+    }
+
+    @PostMapping("/troca-senha")
+    public ResponseEntity<?> trocarSenha(@RequestBody AlterarSenhaRequest request, Authentication auth){
+
+        String emailAtual = auth.getName();
+        userService.changePassword(emailAtual, request);
+        return ResponseEntity.ok("Senha atualizada com sucesso!");
     }
 
 }

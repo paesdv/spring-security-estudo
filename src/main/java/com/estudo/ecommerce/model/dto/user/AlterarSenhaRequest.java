@@ -1,4 +1,4 @@
 package com.estudo.ecommerce.model.dto.user;
 
-public record AlterarSenhaRequest(String email, String senha, String novaSenha) {
+public record AlterarSenhaRequest(String senha, String novaSenha) {
 }

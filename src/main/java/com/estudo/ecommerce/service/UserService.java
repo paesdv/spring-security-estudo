@@ -25,6 +25,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
+    private final PasswordEncoder passwordEncoder;
 
 
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -36,14 +37,21 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
-    public UserResponse changePassword(AlterarSenhaRequest dto) {
-        return UserResponse.toResponse(
-                userRepository.save(
-                        userRepository.findByEmail(dto.email())
-                                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"))
-                                .atualizarSenha(dto.senha())
-                )
+    @Transactional
+    public void changePassword(String emailAtual, AlterarSenhaRequest dto) {
+
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(emailAtual, dto.senha())
         );
+        User user = userRepository.findByEmail(emailAtual)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        if(dto.novaSenha().equals(dto.senha())) {
+            throw new RuntimeException("A nova senha tem que ser diferente da antiga");
+        }
+        user.setSenha(passwordEncoder.encode(dto.novaSenha()));
+        userRepository.save(user);
+
     }
 
     @Transactional
