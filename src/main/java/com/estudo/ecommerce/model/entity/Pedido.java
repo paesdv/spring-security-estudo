@@ -23,15 +23,6 @@ public class Pedido {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "nome_pedido")
-    private String nomePedido;
-
-    @Column(name = "descricao_pedido")
-    private String descricaoPedido;
-
-    @Column(name = "preco")
-    private BigDecimal precoPedido;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User usuario;
@@ -39,6 +30,14 @@ public class Pedido {
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
     private List<PedidoItem> itens;
 
+    private LocalDate dataPedido;
+
+    @PrePersist
+    public void prePersist(){
+        this.dataPedido = LocalDate.now();
+    }
+
+    @Enumerated(EnumType.STRING)
     private StatusPedido status;
 
     public BigDecimal calcularTotal() {
