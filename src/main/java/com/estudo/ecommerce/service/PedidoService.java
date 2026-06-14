@@ -1,5 +1,8 @@
 package com.estudo.ecommerce.service;
 
+import com.estudo.ecommerce.exceptions.BusinessException;
+import com.estudo.ecommerce.exceptions.ResourceNotFoundException;
+import com.estudo.ecommerce.exceptions.UnauthorizedException;
 import com.estudo.ecommerce.model.dto.pedido.PedidoResponseDTO;
 import com.estudo.ecommerce.model.entity.Pedido;
 import com.estudo.ecommerce.model.entity.User;
@@ -28,7 +31,7 @@ public class PedidoService {
 
     public PedidoResponseDTO buscarPorId(UUID id) {
         Pedido pedido = pedidoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Pedido não encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException("Pedido não encontrado."));
 
         validarPropriedade(pedido);
 
@@ -37,12 +40,12 @@ public class PedidoService {
 
     public PedidoResponseDTO cancelarPedido(UUID id) {
         Pedido pedido = pedidoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Pedido não encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException("Pedido não encontrado."));
 
         validarPropriedade(pedido);
 
         if (pedido.getStatus() != StatusPedido.PENDENTE) {
-            throw new RuntimeException("Pedido não pode mais ser cancelado.");
+            throw new BusinessException("Pedido não pode mais ser cancelado.");
         }
 
         pedido.setStatus(StatusPedido.CANCELADO);
@@ -52,7 +55,7 @@ public class PedidoService {
 
     public PedidoResponseDTO atualizarStatus(UUID id, StatusPedido status) {
         Pedido pedido = pedidoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Pedido não encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException("Pedido não encontrado."));
 
         pedido.setStatus(status);
 
@@ -66,7 +69,7 @@ public class PedidoService {
                 .anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
 
         if (!pedido.getUsuario().getId().equals(user.getId()) && !isAdmin) {
-            throw new RuntimeException("Você não tem permissão para acessar este pedido.");
+            throw new UnauthorizedException("Você não tem permissão para acessar este pedido.");
         }
     }
 }

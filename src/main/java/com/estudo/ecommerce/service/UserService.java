@@ -1,5 +1,7 @@
 package com.estudo.ecommerce.service;
 
+import com.estudo.ecommerce.exceptions.BusinessException;
+import com.estudo.ecommerce.exceptions.ResourceNotFoundException;
 import com.estudo.ecommerce.model.dto.user.AlterarEmailRequest;
 import com.estudo.ecommerce.model.dto.user.AlterarSenhaRequest;
 import com.estudo.ecommerce.model.entity.User;
@@ -40,10 +42,10 @@ public class UserService {
                 new UsernamePasswordAuthenticationToken(emailAtual, dto.senha())
         );
         User user = userRepository.findByEmail(emailAtual)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
 
         if(dto.novaSenha().equals(dto.senha())) {
-            throw new RuntimeException("A nova senha tem que ser diferente da antiga");
+            throw new BusinessException("A nova senha tem que ser diferente da antiga");
         }
         user.setSenha(passwordEncoder.encode(dto.novaSenha()));
         userRepository.save(user);
@@ -58,17 +60,15 @@ public class UserService {
         );
 
         User user = userRepository.findByEmail(emailAtual)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
 
         if(userRepository.findByEmail(dto.novoEmail()).isPresent()) {
-            throw new RuntimeException("Email solicitado já em uso.");
+            throw new BusinessException("Email solicitado já em uso.");
         }
 
         user.setEmail(dto.novoEmail());
         userRepository.save(user);
 
     }
-
-
 
 }

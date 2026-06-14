@@ -1,6 +1,7 @@
 package com.estudo.ecommerce.service;
 
 import com.estudo.ecommerce.config.TokenProvider;
+import com.estudo.ecommerce.exceptions.BusinessException;
 import com.estudo.ecommerce.model.dto.user.LoginRequestDTO;
 import com.estudo.ecommerce.model.dto.user.RegisterRequestDTO;
 import com.estudo.ecommerce.model.dto.user.TokenResponseDTO;
@@ -29,10 +30,10 @@ public class AuthService {
     @Value("${jwt.expiration}")
     private long expirationTime;
 
-    public void registerUser(RegisterRequestDTO dto) throws RuntimeException {
+    public void registerUser(RegisterRequestDTO dto) {
 
         if(userRepository.findByEmail(dto.email()).isPresent()){
-            throw new RuntimeException("Email já cadastrado");
+            throw new BusinessException("Email já cadastrado");
         }
 
         userRepository.save(User.builder()
@@ -43,21 +44,15 @@ public class AuthService {
                 .dataCadastro(LocalDate.now())
                 .build()
         );
-
     }
 
-    public TokenResponseDTO login(LoginRequestDTO dto) throws RuntimeException {
-        try{
-            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(dto.email(), dto.senha()));
-            String token = tokenProvider.gerarToken(authentication);
+    public TokenResponseDTO login(LoginRequestDTO dto) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(dto.email(), dto.senha()));
 
-            return new TokenResponseDTO(token, expirationTime);
+        String token = tokenProvider.gerarToken(authentication);
 
-        }catch(BadCredentialsException e){
-            throw new BadCredentialsException("Email ou senha incorretos");
-        }catch(Exception e){
-            throw e;
-        }
+        return new TokenResponseDTO(token, expirationTime);
     }
 
 }

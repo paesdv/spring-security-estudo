@@ -1,7 +1,10 @@
 package com.estudo.ecommerce.service;
 
+import com.estudo.ecommerce.exceptions.BusinessException;
+import com.estudo.ecommerce.exceptions.ResourceNotFoundException;
 import com.estudo.ecommerce.model.dto.pedido.CarrinhoRequestDTO;
 import com.estudo.ecommerce.model.dto.pedido.CarrinhoResponseDTO;
+import com.estudo.ecommerce.model.dto.pedido.PedidoResponseDTO;
 import com.estudo.ecommerce.model.entity.Pedido;
 import com.estudo.ecommerce.model.entity.PedidoItem;
 import com.estudo.ecommerce.model.entity.Produto;
@@ -42,7 +45,7 @@ public class CarrinhoService {
         String usuarioId = "carrinho: " + user.getId().toString();
 
         Produto produto = produtoRepository.findById(request.produtoId())
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado."));
 
         BigDecimal valorTotal = produto.getPreco().multiply(new BigDecimal(request.quantidade()));
 
@@ -62,7 +65,7 @@ public class CarrinhoService {
         String chave = "carrinho: " + user.getId().toString();
 
         if(!hashOps.hasKey(chave, id.toString())) {
-            throw new RuntimeException("Produto não encontrado no carrinho.");
+            throw new ResourceNotFoundException("Produto não encontrado no carrinho.");
         }
         hashOps.delete(chave, id.toString());
     }
@@ -89,7 +92,7 @@ public class CarrinhoService {
         String chave = "carrinho: " + user.getId().toString();
 
         if(!hashOps.hasKey(chave, id.toString())) {
-            throw new RuntimeException("Produto não encontrado no carrinho.");
+            throw new ResourceNotFoundException("Produto não encontrado no carrinho.");
         }
 
         CarrinhoResponseDTO item = (CarrinhoResponseDTO) hashOps.get(chave, id.toString());
@@ -108,14 +111,14 @@ public class CarrinhoService {
 
     }
 
-    public Pedido fecharPedido() {
+    public PedidoResponseDTO fecharPedido() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String chave = "carrinho: " + user.getId().toString();
 
         Map<String, Object> entradas = hashOps.entries(chave);
 
         if (entradas.isEmpty()) {
-            throw new RuntimeException("Carrinho vazio.");
+            throw new BusinessException("Carrinho vazio.");
         }
 
         Pedido pedido = Pedido.builder()
@@ -130,7 +133,14 @@ public class CarrinhoService {
             UUID produtoId = UUID.fromString(produtoIdStr);
 
             Produto produto = produtoRepository.findById(produtoId)
-                    .orElseThrow(() -> new RuntimeException("Produto não encontrado."));
+                    .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado."));
+
+            if (produto.getEstoque() < item.quantidade()) {
+                throw new BusinessException("Estoque insuficiente para o produto: " + produto.getNome());
+            }
+
+            produto.setEstoque(produto.getEstoque() - item.quantidade());
+            produtoRepository.save(produto);
 
             BigDecimal precoUnitario = item.valorTotal().divide(BigDecimal.valueOf(item.quantidade()));
 
@@ -151,8 +161,7 @@ public class CarrinhoService {
 
         redisTemplate.delete(chave);
 
-        return pedido;
+        return PedidoResponseDTO.toResponse(pedido);
     }
-
 
 }

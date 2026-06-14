@@ -2,7 +2,7 @@ package com.estudo.ecommerce.controller;
 
 import com.estudo.ecommerce.model.dto.pedido.CarrinhoRequestDTO;
 import com.estudo.ecommerce.model.dto.pedido.CarrinhoResponseDTO;
-import com.estudo.ecommerce.model.entity.Pedido;
+import com.estudo.ecommerce.model.dto.pedido.PedidoResponseDTO;
 import com.estudo.ecommerce.service.CarrinhoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -49,7 +49,7 @@ public class CarrinhoController {
     }
 
     @PostMapping("/fechar")
-    public ResponseEntity<Pedido> fecharPedido() {
+    public ResponseEntity<PedidoResponseDTO> fecharPedido() {
         return ResponseEntity.ok(carrinhoService.fecharPedido());
     }
 }

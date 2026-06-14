@@ -1,5 +1,7 @@
 package com.estudo.ecommerce.service;
 
+import com.estudo.ecommerce.exceptions.BusinessException;
+import com.estudo.ecommerce.exceptions.ResourceNotFoundException;
 import com.estudo.ecommerce.model.dto.produto.AdicionarProdutoRequestDTO;
 import com.estudo.ecommerce.model.dto.produto.AlterarProdutoRequestDTO;
 import com.estudo.ecommerce.model.dto.produto.ProdutoResponseDTO;
@@ -30,7 +32,7 @@ public class ProdutoService {
 
     public ProdutoResponseDTO createProduct(AdicionarProdutoRequestDTO request) {
         if(produtoRepository.findByNome(request.nome()).isPresent()){
-            throw new RuntimeException("Produto já cadastrado");
+            throw new BusinessException("Produto já cadastrado");
         }
 
         Produto produto = Produto.builder()
@@ -44,7 +46,7 @@ public class ProdutoService {
 
     public ProdutoResponseDTO updateProduct(UUID id, AlterarProdutoRequestDTO request) {
         Produto produto = produtoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado."));
 
         produto.atualizarDados(request);
 
@@ -53,11 +55,9 @@ public class ProdutoService {
 
     public void deleteProduct(UUID id) {
         Produto produto = produtoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado"));
 
         produtoRepository.delete(produto);
     }
-
-
 
 }
