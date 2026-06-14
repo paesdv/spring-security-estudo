@@ -2,7 +2,6 @@ package com.estudo.ecommerce.service;
 
 import com.estudo.ecommerce.model.dto.pedido.CarrinhoRequestDTO;
 import com.estudo.ecommerce.model.dto.pedido.CarrinhoResponseDTO;
-import com.estudo.ecommerce.model.dto.pedido.PedidoResponseDTO;
 import com.estudo.ecommerce.model.entity.Pedido;
 import com.estudo.ecommerce.model.entity.PedidoItem;
 import com.estudo.ecommerce.model.entity.Produto;
@@ -154,9 +153,6 @@ public class CarrinhoService {
 
         return pedido;
     }
-
-
-
 
 
 }
