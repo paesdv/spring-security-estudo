@@ -42,6 +42,7 @@ public class SecurityConfig {
                         .requestMatchers("/v1/produto/**").authenticated()
                         .requestMatchers("/v1/usuario/troca-email").authenticated()
                         .requestMatchers("/v1/auth/**").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
