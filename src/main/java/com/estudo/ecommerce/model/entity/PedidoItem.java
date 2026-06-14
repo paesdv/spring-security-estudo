@@ -19,6 +19,8 @@ public class PedidoItem {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    private String nome;
+
     private Integer quantidade;
 
     private BigDecimal precoUnitario; // preço na hora da compra, congelado

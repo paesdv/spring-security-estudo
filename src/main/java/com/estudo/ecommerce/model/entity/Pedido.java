@@ -40,6 +40,9 @@ public class Pedido {
     @Enumerated(EnumType.STRING)
     private StatusPedido status;
 
+    @Column(nullable = false)
+    private BigDecimal valorTotal;
+
     public BigDecimal calcularTotal() {
         return itens.stream()
                 .map(item -> item.getPrecoUnitario().multiply(BigDecimal.valueOf(item.getQuantidade())))

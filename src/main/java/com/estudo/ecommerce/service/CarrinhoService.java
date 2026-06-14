@@ -2,8 +2,13 @@ package com.estudo.ecommerce.service;
 
 import com.estudo.ecommerce.model.dto.pedido.CarrinhoRequestDTO;
 import com.estudo.ecommerce.model.dto.pedido.CarrinhoResponseDTO;
+import com.estudo.ecommerce.model.dto.pedido.PedidoResponseDTO;
+import com.estudo.ecommerce.model.entity.Pedido;
+import com.estudo.ecommerce.model.entity.PedidoItem;
 import com.estudo.ecommerce.model.entity.Produto;
 import com.estudo.ecommerce.model.entity.User;
+import com.estudo.ecommerce.model.enums.StatusPedido;
+import com.estudo.ecommerce.repository.PedidoRepository;
 import com.estudo.ecommerce.repository.ProdutoRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +18,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -24,6 +31,7 @@ public class CarrinhoService {
     private final RedisTemplate<String, Object> redisTemplate;
     private HashOperations<String, String, Object> hashOps;
     private final ProdutoRepository produtoRepository;
+    private final PedidoRepository pedidoRepository;
 
     @PostConstruct
     public void init() {
@@ -99,6 +107,52 @@ public class CarrinhoService {
         hashOps.put(chave, id.toString(), atualizado);
         return atualizado;
 
+    }
+
+    public Pedido fecharPedido() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String chave = "carrinho: " + user.getId().toString();
+
+        Map<String, Object> entradas = hashOps.entries(chave);
+
+        if (entradas.isEmpty()) {
+            throw new RuntimeException("Carrinho vazio.");
+        }
+
+        Pedido pedido = Pedido.builder()
+                .usuario(user)
+                .status(StatusPedido.PENDENTE)
+                .build();
+
+        List<PedidoItem> itensPedido = new ArrayList<>();
+
+        entradas.forEach((produtoIdStr, valor) -> {
+            CarrinhoResponseDTO item = (CarrinhoResponseDTO) valor;
+            UUID produtoId = UUID.fromString(produtoIdStr);
+
+            Produto produto = produtoRepository.findById(produtoId)
+                    .orElseThrow(() -> new RuntimeException("Produto não encontrado."));
+
+            BigDecimal precoUnitario = item.valorTotal().divide(BigDecimal.valueOf(item.quantidade()));
+
+            PedidoItem pedidoItem = PedidoItem.builder()
+                    .quantidade(item.quantidade())
+                    .precoUnitario(precoUnitario)
+                    .pedido(pedido)
+                    .produto(produto)
+                    .build();
+
+            itensPedido.add(pedidoItem);
+        });
+
+        pedido.setItens(itensPedido);
+        pedido.setValorTotal(pedido.calcularTotal());
+
+        pedidoRepository.save(pedido);
+
+        redisTemplate.delete(chave);
+
+        return pedido;
     }
 
 
