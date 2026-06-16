@@ -9,9 +9,9 @@ import com.estudo.ecommerce.model.entity.Produto;
 import com.estudo.ecommerce.repository.ProdutoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import org.springframework.data.domain.Pageable;
 import java.util.UUID;
 
 @Service
@@ -26,12 +26,14 @@ public class ProdutoService {
     }
 
     public Page<ProdutoResponseDTO> listarPorNome(String nome, Pageable pageable) {
-        return produtoRepository.findByNomeContainingIgnoreCase(nome, pageable)
+        return produtoRepository
+                .findByNomeContainingIgnoreCase(nome, pageable)
                 .map(ProdutoResponseDTO::toResponse);
     }
 
     public ProdutoResponseDTO createProduct(AdicionarProdutoRequestDTO request) {
-        if(produtoRepository.findByNome(request.nome()).isPresent()){
+
+        if (produtoRepository.findByNome(request.nome()).isPresent()) {
             throw new BusinessException("Produto já cadastrado");
         }
 
@@ -39,14 +41,17 @@ public class ProdutoService {
                 .nome(request.nome())
                 .descricao(request.descricao())
                 .preco(request.preco())
+                .estoque(request.estoque())
                 .build();
 
         return ProdutoResponseDTO.toResponse(produtoRepository.save(produto));
     }
 
     public ProdutoResponseDTO updateProduct(UUID id, AlterarProdutoRequestDTO request) {
+
         Produto produto = produtoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado."));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Produto não encontrado."));
 
         produto.atualizarDados(request);
 
@@ -54,10 +59,11 @@ public class ProdutoService {
     }
 
     public void deleteProduct(UUID id) {
+
         Produto produto = produtoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Produto não encontrado"));
 
         produtoRepository.delete(produto);
     }
-
 }
